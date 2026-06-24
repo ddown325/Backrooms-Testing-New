@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>The Backrooms</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 3D canvas (shown during gameplay; hidden behind overlays otherwise) -->
+  <canvas id="game-canvas" style="display:none"></canvas>
+
+  <!-- Title screen -->
+  <div id="title-screen" class="overlay">
+    <div class="title-content">
+      <h1 class="game-title">THE BACKROOMS</h1>
+      <p class="game-subtitle">Level 0 — The Lobby</p>
+      <div class="menu-buttons">
+        <button id="btn-new-game" class="menu-btn primary">New Game</button>
+        <button id="btn-settings" class="menu-btn">Settings</button>
+      </div>
+      <p class="hint">A new maze is generated every time you start over.</p>
+    </div>
+
+    <!-- Settings panel -->
+    <div id="settings-panel" class="settings-panel">
+      <h2>Settings</h2>
+
+      <fieldset>
+        <legend>Audio</legend>
+        <label>Master <input id="s-master" type="range" min="0" max="1" step="0.05" /></label>
+        <label>Ambience <input id="s-amb" type="range" min="0" max="1" step="0.05" /></label>
+        <label>Music <input id="s-mus" type="range" min="0" max="1" step="0.05" /></label>
+        <label>SFX <input id="s-sfx" type="range" min="0" max="1" step="0.05" /></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Graphics (low-end PC friendly)</legend>
+        <label>Render Scale <input id="s-scale" type="range" min="0.5" max="1" step="0.05" /></label>
+        <label>Fog Density <input id="s-fog" type="range" min="0.01" max="0.08" step="0.005" /></label>
+        <label>FOV <input id="s-fov" type="range" min="60" max="90" step="1" /></label>
+        <label class="checkbox">
+          <input id="s-aa" type="checkbox" /> Antialiasing (off = faster)
+        </label>
+      </fieldset>
+
+      <button id="btn-close-settings" class="menu-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- Cutscene overlay -->
+  <div id="cutscene-overlay" class="overlay" style="display:none">
+    <p id="cutscene-text"></p>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hud" style="display:none">
+    <div id="fps-counter">FPS: --</div>
+    <div id="hud-hint">WASD move · Shift sprint · Mouse look · ESC pause</div>
+    <button id="btn-quit" class="hud-btn">Quit to Menu</button>
+  </div>
+
+  <!-- Friendly build-missing notice (shown if dist/main.js fails to load) -->
+  <div id="build-notice" class="overlay" style="display:none">
+    <div class="title-content">
+      <h1 class="game-title" style="color:#ff8a4a">BUILD REQUIRED</h1>
+      <p class="game-subtitle">dist/main.js not found</p>
+      <pre class="hint" style="text-align:left; display:inline-block; margin-top:1rem; line-height:1.6">
+You cloned the repo — now you need to build the bundle.
+
+1) Install deps (one time):
+       npm install
+
+2) Install Rust WASM toolchain (one time, only if not already installed):
+       rustup target add wasm32-unknown-unknown
+       cargo install wasm-bindgen-cli --version 0.2.95
+
+3) Build:
+       ./build.sh
+
+4) Serve and play:
+       python3 -m http.server 8000
+       (then open http://localhost:8000)
+
+If you already built, make sure you are serving the
+project root (not a subfolder) so dist/main.js resolves.
+      </pre>
+      <p class="hint" style="margin-top:1.5rem">Once built, refresh this page.</p>
+    </div>
+  </div>
+
+  <!-- Try to load the bundle; if it 404s, show the build notice -->
+  <script type="module">
+    try {
+      await import('./dist/main.js');
+    } catch (err) {
+      console.error('Failed to load game bundle:', err);
+      const notice = document.getElementById('build-notice');
+      if (notice) notice.style.display = 'flex';
+      const title = document.getElementById('title-screen');
+      if (title) title.style.display = 'none';
+    }
+  </script>
+</body>
+</html>

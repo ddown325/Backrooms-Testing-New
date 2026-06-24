@@ -1,0 +1,20 @@
+{
+  "name": "backrooms_game",
+  "version": "1.0.0",
+  "description": "Realistic Backrooms game — WASM maze gen, Three.js renderer, infinite procedural generation, rare mega rooms, fresh seed per run.",
+  "scripts": {
+    "build": "bash build.sh",
+    "serve": "python3 -m http.server 8000",
+    "start": "npm run build && npm run serve"
+  },
+  "keywords": ["backrooms", "wasm", "three.js", "procedural", "game"],
+  "author": "ddown325",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@types/three": "^0.169.0",
+    "esbuild": "^0.28.1",
+    "three": "^0.169.0",
+    "typescript": "^6.0.3"
+  }
+}
