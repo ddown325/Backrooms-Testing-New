@@ -47,45 +47,41 @@ Backrooms-Testing-New/
 └── README.md
 ```
 
-## Build requirements
+## Run (no build needed — `dist/` is committed)
 
-- **Rust** (stable) with `wasm32-unknown-unknown` target
-- **wasm-bindgen-cli** 0.2.95
-- **Node.js** 18+ with npm
-- **esbuild** (installed via npm)
-
-Install Rust targets and wasm-bindgen-cli once:
-
-```bash
-rustup target add wasm32-unknown-unknown
-cargo install wasm-bindgen-cli --version 0.2.95
-```
-
-## Build
+The compiled bundle (`dist/main.js` + WASM) is included in the repo, so you can clone and play immediately:
 
 ```bash
 git clone https://github.com/ddown325/Backrooms-Testing-New.git
 cd Backrooms-Testing-New
-npm install
-./build.sh
+
+# Serve over HTTP (required — file:// won't work for WASM/fetch)
+python3 -m http.server 8000
+#   or:  npx serve .
+#   or:  bun .
 ```
 
-This compiles Rust → WASM, regenerates the wasm-bindgen JS glue, and bundles TypeScript into a single `dist/main.js` (minified, with sourcemap).
+Open http://localhost:8000 in your browser. Click **New Game** → cutscene → you spawn in a fresh infinite Level 0 maze.
 
-## Run
+## Build (only needed if you edit Rust or TypeScript)
 
-Because the game uses `fetch()` for audio and WASM, you must serve it over HTTP (not `file://`):
+The `dist/` folder in the repo is prebuilt. You only need to rebuild if you change source code.
+
+### Build requirements
+
+- **Rust** (stable) with `wasm32-unknown-unknown` target
+- **wasm-bindgen-cli** 0.2.95
+- **Node.js** 18+ with npm
 
 ```bash
-# Any static server works:
-python3 -m http.server 8000
-#   or
-npx serve .
-#   or
-bun .
-```
+# One-time toolchain setup
+rustup target add wasm32-unknown-unknown
+cargo install wasm-bindgen-cli --version 0.2.95
+npm install
 
-Then open http://localhost:8000 in your browser.
+# Rebuild after editing source
+./build.sh
+```
 
 ## Controls
 
