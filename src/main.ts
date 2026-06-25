@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { Renderer, RendererSettings } from './renderer';
 import { Player } from './player';
 import {
-  initWorld, buildChunk, disposeChunk, initMaterials,
+  initWorld, buildChunk, disposeChunk, initMaterials, getWorld,
   CHUNK_SIZE, CELL_SIZE, ChunkMeshes,
 } from './world';
 import { generateLevelTextures } from './textures';
@@ -148,8 +148,29 @@ async function startNewGame() {
   setState('CUTSCENE');
   await runCutscene();
 
-  // Enter game
-  await enterGame();
+  // Enter game — if this fails, show error instead of black screen
+  try {
+    await enterGame();
+  } catch (err) {
+    console.error('Failed to enter game:', err);
+    showError(err instanceof Error ? err.message : String(err));
+  }
+}
+
+// ---------- Error display ----------
+function showError(msg: string) {
+  const overlay = document.getElementById('cutscene-overlay')!;
+  const text = document.getElementById('cutscene-text')!;
+  overlay.style.background = '#1a0000';
+  overlay.style.display = 'flex';
+  text.innerHTML = `<div style="font-size:0.7em; color:#ff6a4a; margin-bottom:1em">ERROR</div>${msg}<br><br><span style="font-size:0.6em; opacity:0.6">Check the browser console (F12) for details.<br>Click to return to menu.</span>`;
+  text.style.opacity = '1';
+  const clickHandler = () => {
+    overlay.style.display = 'none';
+    overlay.removeEventListener('click', clickHandler);
+    showTitle();
+  };
+  overlay.addEventListener('click', clickHandler);
 }
 
 // ---------- Cutscene: "falling into the backrooms" ----------
@@ -211,7 +232,7 @@ async function enterGame() {
   }
 
   // Find a guaranteed-open spawn cell near chunk (0,0)
-  const world = (await import('./world')).getWorld();
+  const world = getWorld();
   const spawn = world.find_spawn(0, 0);
   const spawnLx = spawn & 0xff;
   const spawnLy = (spawn >> 8) & 0xff;

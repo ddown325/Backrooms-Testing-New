@@ -19,7 +19,17 @@ export const WALL_HEIGHT = 3.2;
 export async function initWorld(seed: number): Promise<void> {
   if (!wasmReady) {
     wasmReady = (async () => {
-      await init(await fetch(wasmUrl).then(r => r.arrayBuffer()));
+      // CRITICAL: resolve the wasm URL relative to THIS module, not the page.
+      // import.meta.url is the URL of this module (dist/main.js after bundling).
+      // wasmUrl is a relative path like "./backrooms_wasm_bg-HASH.wasm".
+      // Without this, fetch() resolves against the page URL and 404s.
+      const url = new URL(wasmUrl, import.meta.url);
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Failed to load WASM module: ${res.status} ${url.href}`);
+      }
+      const buf = await res.arrayBuffer();
+      await init(buf);
     })();
   }
   await wasmReady;
